@@ -10,127 +10,130 @@
     box-sizing:border-box;
     margin:0;
     padding:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 body{
-    background:#f7f9fc;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:#f5f7fb;
     color:#222;
     min-height:100vh;
     display:flex;
     justify-content:center;
-    align-items:center;
-    padding:20px;
+    align-items:flex-start;
+    padding:12px;
 }
 
 .container{
     width:100%;
-    max-width:700px;
+    max-width:560px;
     background:white;
-    border-radius:20px;
-    padding:32px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    border-radius:18px;
+    padding:16px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
 }
 
 h1{
     text-align:center;
-    margin-bottom:24px;
-    color:#1f4ed8;
-}
-
-.section{
-    margin-bottom:24px;
+    color:#2563eb;
+    font-size:1.8rem;
+    margin-bottom:12px;
 }
 
 .mode-group{
     display:flex;
     flex-wrap:wrap;
-    gap:12px;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:12px;
+    font-size:0.95rem;
 }
 
 .mode-group label{
     cursor:pointer;
+    user-select:none;
 }
 
 .problem{
-    font-size:2rem;
-    font-weight:bold;
     text-align:center;
-    margin:20px 0;
-    letter-spacing:3px;
+    font-size:2rem;
+    font-weight:700;
+    letter-spacing:2px;
+    margin-top:8px;
+}
+
+.message{
+    text-align:center;
+    min-height:28px;
+    margin-top:6px;
+    font-size:1.1rem;
+    font-weight:600;
 }
 
 .hint{
     text-align:center;
-    font-size:1.5rem;
-    letter-spacing:8px;
-    color:#888;
-    margin-bottom:20px;
+    color:#777;
+    font-size:1.2rem;
+    letter-spacing:6px;
+    margin:8px 0;
 }
 
 input[type="text"]{
     width:100%;
-    padding:14px;
+    padding:12px;
     font-size:1.2rem;
     border:1px solid #ccc;
     border-radius:12px;
+    outline:none;
 }
 
-button{
-    width:100%;
-    margin-top:12px;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    background:#2563eb;
-    color:white;
-    font-size:1rem;
-    cursor:pointer;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
-.message{
-    margin-top:16px;
-    text-align:center;
-    font-weight:bold;
-    min-height:24px;
+input[type="text"]:focus{
+    border-color:#2563eb;
 }
 
 .stats{
-    margin-top:24px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
+    margin-top:12px;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
     gap:12px;
-}
-
-.card{
-    background:#f5f7fb;
-    border-radius:12px;
-    padding:14px;
-}
-
-.card-title{
     font-size:0.9rem;
-    color:#666;
+    color:#555;
 }
 
-.card-value{
-    font-size:1.4rem;
-    font-weight:bold;
-    margin-top:4px;
+.stats span{
+    white-space:nowrap;
 }
 
-@media(max-width:600px){
+.correct{
+    color:#16a34a;
+}
+
+.incorrect{
+    color:#dc2626;
+}
+
+@media (max-width:600px){
+
+    body{
+        padding:8px;
+    }
+
+    .container{
+        padding:12px;
+    }
+
     .problem{
-        font-size:1.4rem;
+        font-size:1.5rem;
     }
 
     .hint{
-        font-size:1.2rem;
-        letter-spacing:5px;
+        font-size:1rem;
+        letter-spacing:4px;
+    }
+
+    .stats{
+        font-size:0.8rem;
+        gap:8px;
     }
 }
 </style>
@@ -142,55 +145,34 @@ button:hover{
 
 <h1>decode26</h1>
 
-<div class="section">
 <div class="mode-group">
-
 <label><input type="radio" name="mode" value="1"> 1文字</label>
 <label><input type="radio" name="mode" value="3" checked> 3文字</label>
 <label><input type="radio" name="mode" value="4"> 4文字</label>
 <label><input type="radio" name="mode" value="5"> 5文字</label>
 <label><input type="radio" name="mode" value="random"> ランダム</label>
-
-</div>
 </div>
 
 <div class="problem" id="problem"></div>
+
+<div class="message" id="message"></div>
 
 <div class="hint" id="hint"></div>
 
 <input
 type="text"
 id="answer"
-placeholder="英単語を入力"
+placeholder="英単語を入力してEnter"
 autocomplete="off"
+autocapitalize="off"
+spellcheck="false"
 >
 
-<button onclick="submitAnswer()">解答</button>
-
-<div class="message" id="message"></div>
-
 <div class="stats">
-
-<div class="card">
-<div class="card-title">今回</div>
-<div class="card-value" id="currentTime">-</div>
-</div>
-
-<div class="card">
-<div class="card-title">ベスト</div>
-<div class="card-value" id="bestTime">-</div>
-</div>
-
-<div class="card">
-<div class="card-title">直近10回平均</div>
-<div class="card-value" id="averageTime">-</div>
-</div>
-
-<div class="card">
-<div class="card-title">連続正解</div>
-<div class="card-value" id="streak">0</div>
-</div>
-
+<span id="currentTime">今回 -</span>
+<span id="averageTime">平均 -</span>
+<span id="bestTime">Best -</span>
+<span id="streak">連続 0</span>
 </div>
 
 </div>
@@ -223,10 +205,12 @@ const words = {
 };
 
 let currentWord = "";
+let previousWord = "";
+
 let startTime = 0;
 
-let bestTime = null;
 let streak = 0;
+let bestTime = null;
 let recentTimes = [];
 
 function wordToNumbers(word){
@@ -239,136 +223,191 @@ function wordToNumbers(word){
 
 }
 
-function pickWord(){
+function getMode(){
 
-    let mode =
-    document.querySelector('input[name="mode"]:checked').value;
+    return document.querySelector(
+        'input[name="mode"]:checked'
+    ).value;
 
+}
+
+function chooseWord(){
+
+    let mode = getMode();
     let list;
 
-    if(mode==="random"){
+    if(mode === "random"){
 
-        const lengths=[3,4,5];
-        const selected=
-        lengths[Math.floor(Math.random()*lengths.length)];
+        const lengths = [3,4,5];
 
-        list=words[selected];
+        const selected =
+            lengths[Math.floor(
+                Math.random()*lengths.length
+            )];
+
+        list = words[selected];
 
     }else{
 
-        list=words[Number(mode)];
+        list = words[Number(mode)];
 
     }
 
-    currentWord=
-    list[Math.floor(Math.random()*list.length)];
+    let candidate;
+
+    do{
+
+        candidate =
+            list[Math.floor(
+                Math.random()*list.length
+            )];
+
+    }while(
+        list.length > 1 &&
+        candidate === previousWord
+    );
+
+    previousWord = candidate;
+
+    return candidate;
 
 }
 
 function startQuestion(){
 
-    pickWord();
+    currentWord = chooseWord();
 
     document.getElementById("problem").textContent =
-    wordToNumbers(currentWord);
+        wordToNumbers(currentWord);
 
     document.getElementById("hint").textContent =
-    "_ ".repeat(currentWord.length);
+        "_ ".repeat(currentWord.length);
 
-    document.getElementById("answer").value="";
+    document.getElementById("message").textContent = "";
 
-    startTime=performance.now();
+    document.getElementById("answer").value = "";
 
-    document.getElementById("answer").focus();
+    startTime = performance.now();
+
+    setTimeout(() => {
+        document.getElementById("answer").focus();
+    }, 50);
 
 }
 
 function updateStats(time){
 
     document.getElementById("currentTime").textContent =
-    time.toFixed(1)+"秒";
+        "今回 " + time.toFixed(1) + "秒";
 
-    if(bestTime===null || time<bestTime){
+    if(bestTime === null || time < bestTime){
 
-        bestTime=time;
+        bestTime = time;
 
     }
 
     document.getElementById("bestTime").textContent =
-    bestTime.toFixed(1)+"秒";
+        "Best " + bestTime.toFixed(1) + "秒";
 
     recentTimes.push(time);
 
-    if(recentTimes.length>10){
+    if(recentTimes.length > 10){
 
         recentTimes.shift();
 
     }
 
     const avg =
-    recentTimes.reduce((a,b)=>a+b,0)
-    /recentTimes.length;
+        recentTimes.reduce(
+            (a,b)=>a+b,0
+        ) / recentTimes.length;
 
     document.getElementById("averageTime").textContent =
-    avg.toFixed(1)+"秒";
+        "平均 " + avg.toFixed(1) + "秒";
 
     document.getElementById("streak").textContent =
-    streak;
+        "連続 " + streak;
 
 }
 
 function submitAnswer(){
 
     const answer =
-    document.getElementById("answer")
-    .value
-    .trim()
-    .toLowerCase();
+        document.getElementById("answer")
+        .value
+        .trim()
+        .toLowerCase();
+
+    if(answer === "") return;
 
     const elapsed =
-    (performance.now()-startTime)/1000;
+        (performance.now() - startTime) / 1000;
 
-    if(answer===currentWord){
+    const msg =
+        document.getElementById("message");
+
+    if(answer === currentWord){
 
         streak++;
 
-        document.getElementById("message").textContent =
-        `⭕ 正解！ (${currentWord.toUpperCase()})`;
+        msg.className = "message correct";
+
+        msg.textContent =
+            "⭕ " +
+            currentWord.toUpperCase() +
+            " (" +
+            elapsed.toFixed(1) +
+            "秒)";
 
         updateStats(elapsed);
 
     }else{
 
-        streak=0;
+        streak = 0;
 
-        document.getElementById("message").textContent =
-        `❌ 不正解 正解: ${currentWord.toUpperCase()}`;
+        msg.className = "message incorrect";
 
-        document.getElementById("streak").textContent=0;
+        msg.textContent =
+            "❌ " +
+            currentWord.toUpperCase();
+
+        document.getElementById("streak").textContent =
+            "連続 0";
 
     }
 
-    setTimeout(startQuestion,800);
+    setTimeout(
+        startQuestion,
+        800
+    );
 
 }
 
 document
 .getElementById("answer")
-.addEventListener("keydown",e=>{
+.addEventListener(
+    "keydown",
+    e => {
 
-    if(e.key==="Enter"){
+        if(e.key === "Enter"){
 
-        submitAnswer();
+            submitAnswer();
+
+        }
 
     }
-
-});
+);
 
 document
-.querySelectorAll('input[name="mode"]')
-.forEach(r=>{
+.querySelectorAll(
+    'input[name="mode"]'
+)
+.forEach(r => {
 
-    r.addEventListener("change",startQuestion);
+    r.addEventListener(
+        "change",
+        startQuestion
+    );
 
 });
 
