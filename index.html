@@ -1,24 +1,379 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>decode26</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
+    background:#f7f9fc;
+    color:#222;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:700px;
+    background:white;
+    border-radius:20px;
+    padding:32px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:24px;
+    color:#1f4ed8;
+}
+
+.section{
+    margin-bottom:24px;
+}
+
+.mode-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+.mode-group label{
+    cursor:pointer;
+}
+
+.problem{
+    font-size:2rem;
+    font-weight:bold;
+    text-align:center;
+    margin:20px 0;
+    letter-spacing:3px;
+}
+
+.hint{
+    text-align:center;
+    font-size:1.5rem;
+    letter-spacing:8px;
+    color:#888;
+    margin-bottom:20px;
+}
+
+input[type="text"]{
+    width:100%;
+    padding:14px;
+    font-size:1.2rem;
+    border:1px solid #ccc;
+    border-radius:12px;
+}
+
+button{
+    width:100%;
+    margin-top:12px;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#2563eb;
+    color:white;
+    font-size:1rem;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.message{
+    margin-top:16px;
+    text-align:center;
+    font-weight:bold;
+    min-height:24px;
+}
+
+.stats{
+    margin-top:24px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.card{
+    background:#f5f7fb;
+    border-radius:12px;
+    padding:14px;
+}
+
+.card-title{
+    font-size:0.9rem;
+    color:#666;
+}
+
+.card-value{
+    font-size:1.4rem;
+    font-weight:bold;
+    margin-top:4px;
+}
+
+@media(max-width:600px){
+    .problem{
+        font-size:1.4rem;
+    }
+
+    .hint{
+        font-size:1.2rem;
+        letter-spacing:5px;
+    }
+}
+</style>
 </head>
+
 <body>
+
+<div class="container">
 
 <h1>decode26</h1>
 
-<input id="name">
-<button onclick="greet()">挨拶</button>
+<div class="section">
+<div class="mode-group">
 
-<p id="result"></p>
+<label><input type="radio" name="mode" value="1"> 1文字</label>
+<label><input type="radio" name="mode" value="3" checked> 3文字</label>
+<label><input type="radio" name="mode" value="4"> 4文字</label>
+<label><input type="radio" name="mode" value="5"> 5文字</label>
+<label><input type="radio" name="mode" value="random"> ランダム</label>
+
+</div>
+</div>
+
+<div class="problem" id="problem"></div>
+
+<div class="hint" id="hint"></div>
+
+<input
+type="text"
+id="answer"
+placeholder="英単語を入力"
+autocomplete="off"
+>
+
+<button onclick="submitAnswer()">解答</button>
+
+<div class="message" id="message"></div>
+
+<div class="stats">
+
+<div class="card">
+<div class="card-title">今回</div>
+<div class="card-value" id="currentTime">-</div>
+</div>
+
+<div class="card">
+<div class="card-title">ベスト</div>
+<div class="card-value" id="bestTime">-</div>
+</div>
+
+<div class="card">
+<div class="card-title">直近10回平均</div>
+<div class="card-value" id="averageTime">-</div>
+</div>
+
+<div class="card">
+<div class="card-title">連続正解</div>
+<div class="card-value" id="streak">0</div>
+</div>
+
+</div>
+
+</div>
 
 <script>
-function greet() {
-  let name = document.getElementById("name").value;
-  document.getElementById("result").textContent =
-    "こんにちは、" + name + "さん";
+
+const words = {
+
+1:[
+"a","b","c","d","e","f","g","h","i","j",
+"k","l","m","n","o","p","q","r","s","t",
+"u","v","w","x","y","z"
+],
+
+3:[
+"cat","dog","car","bus","pen","cup","bag","sun","sky","sea",
+"map","key","hat","box","egg","fan","bed","toy","jam","ice"
+],
+
+4:[
+"book","tree","fish","door","milk","cake","bird","star","moon","rain",
+"rock","ship","desk","ring","lion","wolf","road","bank","sand","park"
+],
+
+5:[
+"apple","pizza","hotel","music","phone","tiger","water","radio","beach","bread",
+"cloud","train","horse","table","river","light","movie","dream","tower","heart"
+]
+
+};
+
+let currentWord = "";
+let startTime = 0;
+
+let bestTime = null;
+let streak = 0;
+let recentTimes = [];
+
+function wordToNumbers(word){
+
+    return word
+        .toUpperCase()
+        .split("")
+        .map(c => c.charCodeAt(0)-64)
+        .join(" ");
+
 }
+
+function pickWord(){
+
+    let mode =
+    document.querySelector('input[name="mode"]:checked').value;
+
+    let list;
+
+    if(mode==="random"){
+
+        const lengths=[3,4,5];
+        const selected=
+        lengths[Math.floor(Math.random()*lengths.length)];
+
+        list=words[selected];
+
+    }else{
+
+        list=words[Number(mode)];
+
+    }
+
+    currentWord=
+    list[Math.floor(Math.random()*list.length)];
+
+}
+
+function startQuestion(){
+
+    pickWord();
+
+    document.getElementById("problem").textContent =
+    wordToNumbers(currentWord);
+
+    document.getElementById("hint").textContent =
+    "_ ".repeat(currentWord.length);
+
+    document.getElementById("answer").value="";
+
+    startTime=performance.now();
+
+    document.getElementById("answer").focus();
+
+}
+
+function updateStats(time){
+
+    document.getElementById("currentTime").textContent =
+    time.toFixed(1)+"秒";
+
+    if(bestTime===null || time<bestTime){
+
+        bestTime=time;
+
+    }
+
+    document.getElementById("bestTime").textContent =
+    bestTime.toFixed(1)+"秒";
+
+    recentTimes.push(time);
+
+    if(recentTimes.length>10){
+
+        recentTimes.shift();
+
+    }
+
+    const avg =
+    recentTimes.reduce((a,b)=>a+b,0)
+    /recentTimes.length;
+
+    document.getElementById("averageTime").textContent =
+    avg.toFixed(1)+"秒";
+
+    document.getElementById("streak").textContent =
+    streak;
+
+}
+
+function submitAnswer(){
+
+    const answer =
+    document.getElementById("answer")
+    .value
+    .trim()
+    .toLowerCase();
+
+    const elapsed =
+    (performance.now()-startTime)/1000;
+
+    if(answer===currentWord){
+
+        streak++;
+
+        document.getElementById("message").textContent =
+        `⭕ 正解！ (${currentWord.toUpperCase()})`;
+
+        updateStats(elapsed);
+
+    }else{
+
+        streak=0;
+
+        document.getElementById("message").textContent =
+        `❌ 不正解 正解: ${currentWord.toUpperCase()}`;
+
+        document.getElementById("streak").textContent=0;
+
+    }
+
+    setTimeout(startQuestion,800);
+
+}
+
+document
+.getElementById("answer")
+.addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+
+        submitAnswer();
+
+    }
+
+});
+
+document
+.querySelectorAll('input[name="mode"]')
+.forEach(r=>{
+
+    r.addEventListener("change",startQuestion);
+
+});
+
+startQuestion();
+
 </script>
 
 </body>
