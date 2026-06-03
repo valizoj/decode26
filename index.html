@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
 <title>decode26</title>
 </head>
 <body>
+
 <h1>decode26</h1>
-<p>サイト作成テスト</p>
+
+<input id="name">
+<button onclick="greet()">挨拶</button>
+
+<p id="result"></p>
+
+<script>
+function greet() {
+  let name = document.getElementById("name").value;
+  document.getElementById("result").textContent =
+    "こんにちは、" + name + "さん";
+}
+</script>
+
 </body>
 </html>
